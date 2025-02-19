@@ -23,7 +23,7 @@
                 <p class="text-3xl font-extrabold text-yellow-500 mt-2">15</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg transform transition duration-500 hover:scale-105 animate-fade-in delay-200">
-                <h3 class="text-xl font-bold text-gray-700">Completed Tasks</h3>
+                <h3 class="text-xl font-bold text-gray-700">Appointments Completed</h3>
                 <p class="text-3xl font-extrabold text-green-500 mt-2">89</p>
             </div>
         </div>

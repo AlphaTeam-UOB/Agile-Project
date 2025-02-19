@@ -39,10 +39,29 @@ class AdminController extends Controller
 
     // Appointment Management
     public function appointments()
-    {
-        $appointments = Appointment::all(); // Retrieve all appointments from the database
-        return view('AdminSide.Appointments', compact('appointments'));
-    }
+{
+    // Sample data for now (replace this with your actual data later)
+    $appointments = [
+        [
+            'name' => 'John Doe',
+            'email' => 'johndoe@example.com',
+            'date' => '2025-02-20',
+            'time' => '10:00 AM',
+            'status' => 'Scheduled',
+        ],
+        [
+            'name' => 'Jane Smith',
+            'email' => 'janesmith@example.com',
+            'date' => '2025-02-21',
+            'time' => '2:00 PM',
+            'status' => 'Scheduled',
+        ]
+    ];
+
+    // Pass data to the view
+    return view('AdminSide.Appointments', compact('appointments'));
+}
+
 
     // Manage Appointments
     public function manageAppointments(Request $request)
