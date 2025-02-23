@@ -69,7 +69,18 @@
             </div>
         </div>
     </section>
-
+<!-- Call to Action Section -->
+<div class="bg-gradient-to-r from-blue-600 to-indigo-600 py-12 text-center animate-fade-in">
+    <h2 class="text-3xl font-semibold text-white mb-6 transform transition duration-500 hover:scale-105">
+        Ready to Schedule an Appointment?
+    </h2>
+    <p class="text-lg text-white mb-6 max-w-3xl mx-auto">
+        Book your eye care appointment today and experience the best in personalized, professional care.
+    </p>
+    <a href="/appointment" class="inline-block bg-white text-blue-600 text-lg font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+        Book Now
+    </a>
+</div>
     <!-- Include Footer -->
     @include('CustomerSide.partials.footer')
 

@@ -34,7 +34,7 @@
                     </a>
                 </li>
                 <li class="mb-4">
-                    <a href="{{ route('admin.appointments') }}" class="block py-2 px-4 flex items-center hover:bg-gray-700 rounded transition">
+                    <a href="{{ route('admin.appointments.index') }}" class="block py-2 px-4 flex items-center hover:bg-gray-700 rounded transition">
                         <span class="mr-3">📅</span>
                         <span x-show="isSidebarOpen">Appointments</span>
                     </a>

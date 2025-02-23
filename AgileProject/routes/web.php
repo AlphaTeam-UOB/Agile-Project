@@ -1,6 +1,15 @@
 <?php
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminControllers\AdminController;
+use App\Http\Controllers\CustomerControllers\AppointmentController;
+use App\Http\Controllers\AdminControllers\AppointmentController AS adminAppointmentController;
+
+
+
+
+
+Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index'); // Optional, if you need to display all appointments.
 
 // Customer Side Routes
 Route::get('/about', function () {
@@ -23,20 +32,23 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Admin Routes (NO AUTH REQUIRED FOR NOW)
-Route::prefix('admin')->name('admin.')->group(function() {
+Route::prefix('admin')->group(function() {
     // Admin Login
-    Route::get('/login', [AdminController::class, 'loginForm'])->name('login');
-    Route::post('/login', [AdminController::class, 'login'])->name('login.post');
+    Route::get('/login', [AdminController::class, 'loginForm'])->name('admin.login');
+    Route::post('/login', [AdminController::class, 'login'])->name('admin.login.post');
 
     // Admin Dashboard
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
     // Admin Profile Management
-    Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
-    Route::post('/profile/update', [AdminController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/profile', [AdminController::class, 'profile'])->name('admin.profile');
+    Route::post('/profile/update', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
 
-    // Appointment Management
-    Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
-    Route::post('/appointments/manage', [AdminController::class, 'manageAppointments'])->name('appointments.manage');
+    // Admin Appointments Routes
+    Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('admin.appointments.index');
+    Route::get('/appointments/create', [AdminAppointmentController::class, 'create'])->name('admin.appointments.create');
+    Route::post('/appointments', [AdminAppointmentController::class, 'store'])->name('admin.appointments.store');
+    Route::get('/appointments/{appointment}/edit', [AdminAppointmentController::class, 'edit'])->name('admin.appointments.edit');
+    Route::put('/appointments/{appointment}', [AdminAppointmentController::class, 'update'])->name('admin.appointments.update');
+    Route::delete('/appointments/{appointment}', [AdminAppointmentController::class, 'destroy'])->name('admin.appointments.destroy');
 });

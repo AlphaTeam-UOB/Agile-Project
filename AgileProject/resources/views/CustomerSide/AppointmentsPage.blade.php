@@ -10,6 +10,8 @@
     <!-- Appointment Booking Form -->
     <div class="max-w-lg mx-auto mt-8 bg-white p-6 rounded-lg shadow-md">
         <form action="#" method="POST">
+            @csrf
+            
             <label class="block text-lg font-semibold text-gray-700">Full Name</label>
             <input type="text" name="name" required class="w-full p-2 border border-gray-300 rounded-lg mt-2">
 
@@ -27,6 +29,18 @@
                 <option value="2:00 PM">2:00 PM</option>
                 <option value="3:00 PM">3:00 PM</option>
             </select>
+
+            <label class="block text-lg font-semibold text-gray-700 mt-4">Type of Consultation</label>
+            <select name="consultation_type" required class="w-full p-2 border border-gray-300 rounded-lg mt-2">
+                <option value="">Select Consultation Type</option>
+                <option value="General Checkup">General Checkup</option>
+                <option value="Eye Examination">Eye Examination</option>
+                <option value="Contact Lens Fitting">Contact Lens Fitting</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label class="block text-lg font-semibold text-gray-700 mt-4">Description</label>
+            <textarea name="description" rows="4" required class="w-full p-2 border border-gray-300 rounded-lg mt-2" placeholder="Describe your concerns..."></textarea>
 
             <button type="submit" class="mt-6 w-full bg-red-700 text-white py-2 rounded-lg hover:bg-red-800 transition duration-300">
                 Book Appointment
