@@ -3,7 +3,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminControllers\AdminController;
 use App\Http\Controllers\CustomerControllers\AppointmentController;
 use App\Http\Controllers\AdminControllers\AppointmentController AS adminAppointmentController;
-
+use App\Http\Controllers\AdminControllers\DashboardController;
 
 
 
@@ -38,7 +38,8 @@ Route::prefix('admin')->group(function() {
     Route::post('/login', [AdminController::class, 'login'])->name('admin.login.post');
 
     // Admin Dashboard
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+// Admin Dashboard
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Admin Profile Management
     Route::get('/profile', [AdminController::class, 'profile'])->name('admin.profile');
