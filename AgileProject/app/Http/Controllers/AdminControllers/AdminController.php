@@ -1,71 +1,34 @@
 <?php
-
 namespace App\Http\Controllers\AdminControllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    // Show Login Form
     public function loginForm()
     {
         return view('AdminSide.Login');
     }
 
-    // Handle Login
     public function login(Request $request)
     {
-        // Logic to authenticate admin (you may want to use Laravel's built-in auth system)
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6'
+        ]);
+
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            return redirect()->route('admin.dashboard'); // Ensure correct redirect after login
+        } else {
+            return back()->withErrors(['email' => 'Invalid credentials.']);
+        }
     }
 
-    // Admin Dashboard
-    public function dashboard()
+    public function logout()
     {
-        return view('AdminSide.Dashboard');
-    }
-
-    // Admin Profile
-    public function profile()
-    {
-        return view('AdminSide.Profile');
-    }
-
-    // Update Admin Profile
-    public function updateProfile(Request $request)
-    {
-        // Logic to update admin profile
-    }
-
-    // Appointment Management
-    public function appointments()
-{
-    // Sample data for now (replace this with your actual data later)
-    $appointments = [
-        [
-            'name' => 'John Doe',
-            'email' => 'johndoe@example.com',
-            'date' => '2025-02-20',
-            'time' => '10:00 AM',
-            'status' => 'Scheduled',
-        ],
-        [
-            'name' => 'Jane Smith',
-            'email' => 'janesmith@example.com',
-            'date' => '2025-02-21',
-            'time' => '2:00 PM',
-            'status' => 'Scheduled',
-        ]
-    ];
-
-    // Pass data to the view
-    return view('AdminSide.Appointments', compact('appointments'));
-}
-
-
-    // Manage Appointments
-    public function manageAppointments(Request $request)
-    {
-        // Logic to manage appointments
+        Auth::logout();
+        return redirect()->route('admin.dashboard');
     }
 }

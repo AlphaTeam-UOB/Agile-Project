@@ -6,6 +6,8 @@
     <title>Admin Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
     <style>
         .sidebar-transition {
             transition: width 0.3s ease-in-out, opacity 0.3s ease-in-out;
@@ -57,14 +59,48 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col">
 
-            <!-- Top Bar -->
-            <div class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
-                <h1 class="text-xl font-bold">Home</h1>
-                <div class="flex items-center space-x-4">
-                    <span class="text-gray-700 font-semibold">Admin Name</span>
-                    <img src="https://via.placeholder.com/40" class="rounded-full w-10 h-10 border border-gray-300" alt="Admin Avatar">
-                </div>
-            </div>
+<!-- Top Bar -->
+<div class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">Home</h1>
+    <div class="flex items-center space-x-6">
+        <!-- Time-Based Greeting -->
+        <span class="text-gray-700 font-semibold">
+            @php
+                $hour = now()->hour; // Get the current hour
+                $greeting = 'Good Day';
+                if ($hour >= 5 && $hour < 12) {
+                    $greeting = 'Good Morning';
+                } elseif ($hour >= 12 && $hour < 18) {
+                    $greeting = 'Good Afternoon';
+                } elseif ($hour >= 18 && $hour < 22) {
+                    $greeting = 'Good Evening';
+                }
+            @endphp
+            {{ $greeting }},
+        </span>
+
+        <!-- User's Name -->
+        <span class="text-gray-700 font-semibold">
+            {{ Auth::check() ? Auth::user()->name : 'Guest' }}
+        </span>
+
+        <!-- Admin Avatar -->
+        <img src="{{ asset('images/admin.png') }}" class="rounded-full w-10 h-10 border border-gray-300" alt="Admin Avatar">
+
+        <!-- Logout Button with FontAwesome Icon -->
+        @if(Auth::check())
+            <form action="{{ route('admin.logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="flex items-center text-gray-700 font-semibold text-sm bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </button>
+            </form>
+        @endif
+    </div>
+</div>
+
+        
+
 
             <!-- Page Content -->
             <div class="p-6 bg-gray-100 flex-1">
