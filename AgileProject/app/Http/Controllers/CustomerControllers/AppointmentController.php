@@ -30,6 +30,6 @@ class AppointmentController extends Controller
     public function index()
     {
         $appointments = Appointment::latest()->get();
-        return view('appointments.index', compact('appointments'));
+        return view('CustomerSide.AppointmentsPage', compact('appointments'));
     }
 }
