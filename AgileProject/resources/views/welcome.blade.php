@@ -60,7 +60,7 @@
             <div class="text-white px-6 max-w-2xl">
                 <h1 class="text-5xl font-extrabold mb-4 animate-fade-in tracking-widest uppercase">Your Vision, Our Priority</h1>
                 <p class="text-lg mb-6 animate-fade-in delay-200 tracking-wide">Providing expert eye care solutions with precision and care.</p>
-                <a href="{{ url('/services') }}" class="bg-white text-red-700 px-6 py-3 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-200 transition">Discover More</a>
+                <a href="{{ url('/appointments') }}" class="bg-white text-red-700 px-6 py-3 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-200 transition">Discover More</a>
             </div>
         </div>
     </div>
@@ -93,7 +93,7 @@
         <p class="text-lg text-white mb-6 max-w-3xl mx-auto">
             Book your eye care appointment today and experience the best in personalized, professional care.
         </p>
-        <a href="/appointment" class="inline-block bg-white text-blue-600 text-lg font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+        <a href="{{ url('/appointments') }}" class="inline-block bg-white text-blue-600 text-lg font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-300 transform hover:scale-105">
             Book Now
         </a>
     </div>
