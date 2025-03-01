@@ -1,11 +1,11 @@
 <?php
 
-
 namespace App\Http\Controllers\CustomerControllers;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Appointment;
+use App\Mail\AppointmentConfirmationMail;
+use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
@@ -21,9 +21,12 @@ class AppointmentController extends Controller
             'description' => 'required|string',
         ]);
 
-        Appointment::create($request->all());
+        $appointment = Appointment::create($request->all());
 
-        return redirect()->back()->with('success', 'Appointment booked successfully!');
+        // Send confirmation email
+        Mail::to($request->email)->send(new AppointmentConfirmationMail($appointment));
+
+        return redirect()->back()->with('success', 'Appointment booked successfully! A confirmation email has been sent.');
     }
 
     // Fetch all appointments (optional for admin view)
@@ -32,4 +35,8 @@ class AppointmentController extends Controller
         $appointments = Appointment::latest()->get();
         return view('CustomerSide.AppointmentsPage', compact('appointments'));
     }
+
+    // Show a specific appointment
+
+    
 }

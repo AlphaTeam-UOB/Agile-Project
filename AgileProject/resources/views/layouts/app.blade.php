@@ -7,6 +7,12 @@
     <!-- Favicon for Browser Tab -->
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add Toastify CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+<!-- Add Toastify JS -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 </head>
 <body class="bg-gray-50 font-[Poppins,sans-serif] flex flex-col min-h-screen">
 
