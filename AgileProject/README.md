@@ -8,7 +8,7 @@ Before starting, make sure you have the following installed:
 - A database system (MySQL, PostgreSQL, SQLite, etc.)
 - [Git](https://git-scm.com/downloads) (optional, but recommended)
 - [XAMPP](https://www.apachefriends.org/) or any alternative server
-
+Ngrok (for exposing your local server to the internet)
 ## 1. Start MySQL and Apache
 If you're using **XAMPP**, open the control panel and start **Apache** and **MySQL**.
 If you're using another local server, ensure your web server and database are running.
@@ -110,3 +110,41 @@ Press `CTRL + C` in the terminal to stop the server.
 ## Conclusion
 Now you have a fully set up Laravel project with an admin user. 🎉
 
+7. Set Up Ngrok for Public Access
+To expose your local Laravel server to the internet (required for Dialogflow integration):
+
+Download and Install Ngrok:
+
+Go to ngrok.com and download the appropriate version for your operating system.
+
+Extract the .zip file to a directory (e.g., C:\ngrok).
+
+Add Ngrok to System PATH:
+
+Add the directory where you extracted Ngrok to your system's PATH (see Ngrok installation instructions).
+
+Authenticate Ngrok:
+
+Sign up for a free Ngrok account at https://dashboard.ngrok.com/signup.
+
+Copy your authtoken from the Ngrok dashboard: https://dashboard.ngrok.com/get-started/your-authtoken.
+
+Run the following command to authenticate Ngrok:
+
+bash
+Copy
+ngrok authtoken YOUR_AUTHTOKEN
+Expose Your Laravel Server:
+
+In a new terminal, run the following command:
+
+bash
+Copy
+ngrok http 8000
+Ngrok will generate a public URL (e.g., https://abcd1234.ngrok.io).
+
+Update Dialogflow Webhook URL:
+
+Go to your Dialogflow agent's Fulfillment settings.
+
+Replace the webhook URL with the Ngrok URL (e.g., https://abcd1234.ngrok.io/chatbot).
