@@ -40,7 +40,7 @@ class AppointmentController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->route('AdminSide.Appointments.index')->with('success', 'Appointment created successfully!');
+        return redirect()->route('admin.appointments.index')->with('success', 'Appointment created successfully!');
     }
 
     // Show the form for editing an appointment
@@ -57,7 +57,7 @@ class AppointmentController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'date' => 'required|date',
-            'time' => 'required|date_format:H:i',
+            'time' => 'required|string',
             'status' => 'required|in:Scheduled,Completed,Cancelled',
         ]);
 
@@ -70,7 +70,7 @@ class AppointmentController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->route('AdminSide.Appointments.index')->with('success', 'Appointment updated successfully!');
+        return redirect()->route('admin.appointments.index')->with('success', 'Appointment updated successfully!');
     }
 
     // Delete an appointment
@@ -79,6 +79,6 @@ class AppointmentController extends Controller
         $appointment = Appointment::findOrFail($id);
         $appointment->delete();
 
-        return redirect()->route('AdminSide.Appointments.index')->with('success', 'Appointment deleted successfully!');
+        return redirect()->route('admin.appointments.index')->with('success', 'Appointment deleted successfully!');
     }
 }

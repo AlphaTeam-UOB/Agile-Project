@@ -66,28 +66,41 @@
 </div>
 
 <script>
-document.getElementById('chatbot-btn').addEventListener('click', function() {
-    document.getElementById('chatbot-container').classList.toggle('hidden');
-});
-
-document.getElementById('close-chatbot').addEventListener('click', function() {
-    document.getElementById('chatbot-container').classList.add('hidden');
-});
-
-document.getElementById('chatbot-input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        const message = e.target.value;
-        e.target.value = '';
-
-        // Display user message
-        let chatbotMessages = document.getElementById('chatbot-messages');
-        chatbotMessages.innerHTML += `<div class="text-right text-gray-900">${message}</div>`;
-
-        // Simulate chatbot response
-        setTimeout(() => {
-            chatbotMessages.innerHTML += `<div class="text-left text-gray-700">Checking available slots...</div>`;
-        }, 500);
-    }
-});
-</script>
+    document.getElementById('chatbot-btn').addEventListener('click', function() {
+        document.getElementById('chatbot-container').classList.toggle('hidden');
+    });
+    
+    document.getElementById('close-chatbot').addEventListener('click', function() {
+        document.getElementById('chatbot-container').classList.add('hidden');
+    });
+    
+    document.getElementById('chatbot-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const message = e.target.value;
+            e.target.value = '';
+    
+            let chatbotMessages = document.getElementById('chatbot-messages');
+            chatbotMessages.innerHTML += `<div class="text-right text-gray-900">You: ${message}</div>`;
+    
+            fetch('/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ queryResult: { intent: { displayName: message } } })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatbotMessages.innerHTML += `<div class="text-left text-gray-700">Bot: ${data.fulfillmentText}</div>`;
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                chatbotMessages.innerHTML += `<div class="text-left text-gray-700">Bot: Sorry, something went wrong.</div>`;
+            });
+        }
+    });
+    </script>
+    
 @endsection

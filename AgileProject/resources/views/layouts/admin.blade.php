@@ -50,12 +50,7 @@
                     </a>
                 </li>
             </ul>
-            <div class="p-6">
-                <a href="#" class="block py-2 px-4 flex items-center text-red-500 hover:text-red-300 transition">
-                    <span class="mr-3">🚪</span>
-                    <span x-show="isSidebarOpen">Logout</span>
-                </a>
-            </div>
+         
         </div>
 
         <!-- Main Content -->

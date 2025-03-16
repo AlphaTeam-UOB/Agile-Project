@@ -4,7 +4,10 @@ use App\Http\Controllers\AdminControllers\AdminController;
 use App\Http\Controllers\CustomerControllers\AppointmentController;
 use App\Http\Controllers\AdminControllers\AppointmentController as AdminAppointmentController;
 use App\Http\Controllers\AdminControllers\DashboardController;
+use App\Http\Controllers\CustomerControllers\ChatbotController;
 
+// Chatbot Webhook Route
+Route::post('/chatbot', [ChatbotController::class, 'handle']);
 // Customer Side Routes
 Route::get('/about', function () {
     return view('CustomerSide.AboutUs');
@@ -46,13 +49,12 @@ Route::prefix('admin')->group(function () {
         Route::post('/profile/update', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
 
         // Admin Appointments Routes
-        Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('admin.appointments.index');
-        Route::get('/appointments/create', [AdminAppointmentController::class, 'create'])->name('admin.appointments.create');
-        Route::post('/appointments', [AdminAppointmentController::class, 'store'])->name('admin.appointments.store');
-        Route::get('/appointments/{appointment}/edit', [AdminAppointmentController::class, 'edit'])->name('admin.appointments.edit');
-        Route::put('/appointments/{appointment}', [AdminAppointmentController::class, 'update'])->name('admin.appointments.update');
-        Route::delete('/appointments/{appointment}', [AdminAppointmentController::class, 'destroy'])->name('admin.appointments.destroy');
-
+    Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('admin.appointments.index');
+    Route::get('/appointments/create', [AdminAppointmentController::class, 'create'])->name('admin.appointments.create');
+    Route::post('/appointments', [AdminAppointmentController::class, 'store'])->name('admin.appointments.store');
+    Route::get('/appointments/{appointment}/edit', [AdminAppointmentController::class, 'edit'])->name('admin.appointments.edit');
+    Route::put('/appointments/{appointment}', [AdminAppointmentController::class, 'update'])->name('admin.appointments.update');
+    Route::delete('/appointments/{appointment}', [AdminAppointmentController::class, 'destroy'])->name('admin.appointments.destroy');
         // Admin Logout
         Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
     });
