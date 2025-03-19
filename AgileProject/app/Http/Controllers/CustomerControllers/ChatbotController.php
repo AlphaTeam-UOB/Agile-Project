@@ -4,65 +4,102 @@ namespace App\Http\Controllers\CustomerControllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Appointment;
+use Google\Client as Google_Client;
+use Illuminate\Support\Facades\Log;
 
 class ChatbotController extends Controller
 {
-    public function handle(Request $request)
+    public function handleRequest(Request $request)
     {
-        $intent = $request->input('queryResult.intent.displayName');
+        \Log::info('Chatbot request received:', $request->all());
 
-        switch ($intent) {
-            case 'CheckAvailableSlots':
-                return $this->checkAvailableSlots();
-            case 'BookAppointment':
-                return $this->bookAppointment($request);
-            case 'CancelAppointment':
-                return $this->cancelAppointment($request);
-            default:
-                return response()->json(['fulfillmentText' => 'Sorry, I did not understand that.']);
-        }
-    }
+        // Get the user's message from the request
+        $userMessage = $request->input('message');
 
-    private function checkAvailableSlots()
-    {
-        $availableSlots = Appointment::where('available', true)->pluck('time')->toArray();
+        // Send the message to Dialogflow and get the response
+        $responseText = $this->sendToDialogflow($userMessage);
+
+        // Return the response as JSON
         return response()->json([
-            'fulfillmentText' => empty($availableSlots) ? 'No available slots.' : 'Available slots: ' . implode(', ', $availableSlots)
+            "fulfillmentText" => $responseText
         ]);
     }
 
-    private function bookAppointment(Request $request)
+    private function sendToDialogflow($userMessage)
     {
-        $params = $request->input('queryResult.parameters');
+        try {
+            // Path to your Dialogflow service account key
+            $credentialsPath = storage_path('app/dialogflow-key.json');
+            $projectId = env('DIALOGFLOW_PROJECT_ID');
+            $sessionId = uniqid();
 
-        $appointment = Appointment::create([
-            'name' => $params['name'],
-            'email' => $params['email'],
-            'date' => $params['date'],
-            'time' => $params['time'],
-            'consultation_type' => $params['consultation_type'],
-            'description' => $params['description'],
-            'available' => false
-        ]);
+            // Log service account details
+            $credentials = json_decode(file_get_contents($credentialsPath), true);
+            \Log::info('Service Account Details:', [
+                'client_email' => $credentials['client_email'],
+                'project_id' => $credentials['project_id'],
+            ]);
 
-        return response()->json(['fulfillmentText' => 'Your appointment is booked for ' . $params['date'] . ' at ' . $params['time']]);
-    }
+            // Log the request payload
+            \Log::info('Dialogflow API Request Payload:', [
+                'projectId' => $projectId,
+                'sessionId' => $sessionId,
+                'queryInput' => [
+                    'text' => [
+                        'text' => $userMessage,
+                        'languageCode' => 'en-US',
+                    ],
+                ],
+            ]);
 
-    private function cancelAppointment(Request $request)
-    {
-        $params = $request->input('queryResult.parameters');
+            // Create a Google_Client instance
+            $client = new Google_Client();
+            $client->setAuthConfig($credentialsPath);
+            $client->addScope('https://www.googleapis.com/auth/dialogflow');
 
-        $appointment = Appointment::where('email', $params['email'])
-                                  ->where('date', $params['date'])
-                                  ->where('time', $params['time'])
-                                  ->first();
+            // Log the Google_Client configuration
+            \Log::info('Google_Client Configuration:', [
+                'auth_config' => $credentialsPath,
+                'scopes' => $client->getScopes(),
+            ]);
 
-        if ($appointment) {
-            $appointment->delete();
-            return response()->json(['fulfillmentText' => 'Your appointment has been canceled.']);
-        } else {
-            return response()->json(['fulfillmentText' => 'No appointment found with the provided details.']);
+            // Get the Guzzle HTTP client
+            $httpClient = $client->authorize();
+
+            // Define the Dialogflow API endpoint
+            $url = "https://dialogflow.googleapis.com/v2/projects/$projectId/agent/sessions/$sessionId:detectIntent";
+
+            // Send the POST request to Dialogflow
+            $response = $httpClient->post($url, [
+                'json' => [
+                    'queryInput' => [
+                        'text' => [
+                            'text' => $userMessage,
+                            'languageCode' => 'en-US',
+                        ],
+                    ],
+                ],
+            ]);
+
+            // Decode the response
+            $responseData = json_decode($response->getBody(), true);
+
+            // Log the full response for debugging
+            \Log::info('Dialogflow API Response:', $responseData);
+
+            // Check if the response contains the expected key
+            if (!isset($responseData['queryResult'])) {
+                throw new \Exception('Invalid response from Dialogflow API: queryResult key missing.');
+            }
+
+            // Get the fulfillment text from the response
+            return $responseData['queryResult']['fulfillmentText'];
+        } catch (\Exception $e) {
+            \Log::error('Dialogflow Error:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(), // Log the full stack trace
+            ]);
+            return "Sorry, something went wrong. Please try again later.";
         }
     }
 }

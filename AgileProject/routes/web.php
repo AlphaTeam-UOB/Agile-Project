@@ -7,7 +7,7 @@ use App\Http\Controllers\AdminControllers\DashboardController;
 use App\Http\Controllers\CustomerControllers\ChatbotController;
 
 // Chatbot Webhook Route
-Route::post('/chatbot', [ChatbotController::class, 'handle']);
+Route::post('/chatbot', [ChatbotController::class, 'handleRequest']);
 // Customer Side Routes
 Route::get('/about', function () {
     return view('CustomerSide.AboutUs');
