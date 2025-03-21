@@ -1,6 +1,57 @@
 @extends('layouts.admin')
 
 @section('content')
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Select all delete buttons
+    document.querySelectorAll(".delete-button").forEach(button => {
+        button.addEventListener("click", function() {
+            let form = this.closest(".delete-form");
+            let appointmentId = form.getAttribute("data-id");
+
+            // Confirm before deleting
+            if (confirm("Are you sure you want to delete this appointment?")) {
+                fetch(form.action, {
+                    method: "POST",
+                    body: new FormData(form),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Remove the deleted row
+                        form.closest("tr").remove();
+                        
+                        // Show Toastify success message
+                        Toastify({
+                            text: "Appointment deleted successfully!",
+                            duration: 3000,
+                            close: true,
+                            gravity:"top",
+                            position: "center",
+                            backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)"
+                        }).showToast();
+                    } else {
+                        throw new Error("Delete failed");
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    Toastify({
+                        text: "Error deleting appointment!",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "linear-gradient(to right, #ff5f6d, #d62929)"
+                    }).showToast();
+                });
+            }
+        });
+    });
+});
+</script>
+
+
 <div class="container mx-auto px-6 py-12">
     <h1 class="text-4xl font-bold text-gray-900 text-center">Appointments</h1>
     <p class="mt-4 text-lg text-gray-700 text-center">
@@ -44,13 +95,14 @@
                                 <a href="{{ route('admin.appointments.edit', $appointment->id) }}" class="text-blue-500 hover:text-blue-700">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <form action="{{ route('admin.appointments.destroy', $appointment->id) }}" method="POST" style="display: inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-500 hover:text-red-700 ml-2">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </form>
+                                <form class="delete-form" data-id="{{ $appointment->id }}" action="{{ route('admin.appointments.destroy', $appointment->id) }}" method="POST" style="display: inline-block;">
+    @csrf
+    @method('DELETE')
+    <button type="button" class="delete-button text-red-500 hover:text-red-700 ml-2">
+        <i class="fas fa-trash"></i> Delete
+    </button>
+</form>
+
                             </td>
                         </tr>
                     @endforeach
