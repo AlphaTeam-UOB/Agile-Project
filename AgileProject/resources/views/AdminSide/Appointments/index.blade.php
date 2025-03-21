@@ -4,11 +4,33 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Select all delete buttons
+    // Show Toastify notification if there's a success message
+    @if(session('success'))
+        Toastify({
+            text: "{{ session('success') }}",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)"
+        }).showToast();
+    @endif
+
+    @if(session('error'))
+        Toastify({
+            text: "{{ session('error') }}",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "linear-gradient(to right, #ff5f6d, #d62929)"
+        }).showToast();
+    @endif
+
+    // Delete confirmation & Toastify message
     document.querySelectorAll(".delete-button").forEach(button => {
         button.addEventListener("click", function() {
             let form = this.closest(".delete-form");
-            let appointmentId = form.getAttribute("data-id");
 
             // Confirm before deleting
             if (confirm("Are you sure you want to delete this appointment?")) {
