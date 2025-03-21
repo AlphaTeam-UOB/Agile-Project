@@ -108,7 +108,7 @@
 
             <!-- Copyright Bar -->
             <footer class="bg-gray-800 text-white text-center py-2 mt-auto">
-                &copy; 2024 Admin Panel. All rights reserved.
+            <div class="bg-gray-900 text-gray-400 text-center py-3">© {{ date('Y') }} A.A. Samarasinghe Optometrists. All rights reserved.</div>
             </footer>
         </div>
     </div>
