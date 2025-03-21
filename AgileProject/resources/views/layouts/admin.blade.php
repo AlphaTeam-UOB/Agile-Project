@@ -9,6 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+ 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
     <style>
         .sidebar-transition {
@@ -17,7 +19,7 @@
     </style>
 </head>
 <body class="bg-gray-100 flex flex-col h-screen">
-
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <div x-data="{ isSidebarOpen: true }" class="flex flex-1">
 
         <!-- Sidebar -->
@@ -111,5 +113,7 @@
         </div>
     </div>
 
+
+    @yield('scripts') 
 </body>
 </html>
