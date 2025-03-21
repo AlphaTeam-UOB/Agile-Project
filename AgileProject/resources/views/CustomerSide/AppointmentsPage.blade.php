@@ -9,7 +9,7 @@
 
     <!-- Appointment Booking Form -->
     <div class="max-w-lg mx-auto mt-8 bg-white p-6 rounded-lg shadow-md">
-        <form action="#" method="POST">
+        <form action="#" method="POST" id="appointment-form">
             @csrf
             
             <label class="block text-lg font-semibold text-gray-700">Full Name</label>
@@ -42,7 +42,7 @@
             <label class="block text-lg font-semibold text-gray-700 mt-4">Description</label>
             <textarea name="description" rows="4"  class="w-full p-2 border border-gray-300 rounded-lg mt-2" placeholder="Describe your concerns..."></textarea>
 
-            <button type="submit" class="mt-6 w-full bg-red-700 text-white py-2 rounded-lg hover:bg-red-800 transition duration-300">
+            <button type="submit" id="book-appointment-btn"  class="mt-6 w-full bg-red-700 text-white py-2 rounded-lg hover:bg-red-800 transition duration-300">
                 Book Appointment
             </button>
         </form>
@@ -150,5 +150,61 @@
             });
         }
     });
+
+    // Handle appointment form submission
+   
+    document.getElementById('appointment-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    let formData = new FormData(this);
+
+    fetch("{{ route('appointments.store') }}", { // Update with the correct route
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Toastify({
+                text: data.message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "center",
+                backgroundColor: "#4CAF50",
+            }).showToast();
+
+            // Reset form after successful submission
+            document.getElementById('appointment-form').reset();
+        } else {
+            Toastify({
+                text: data.message || "Failed to book appointment. Try again!",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "center",
+                backgroundColor: "#FF0000",
+            }).showToast();
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        Toastify({
+            text: "Something went wrong. Please try again later.",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#FF0000",
+        }).showToast();
+    });
+});
+
+
+
+
 </script>
 @endsection

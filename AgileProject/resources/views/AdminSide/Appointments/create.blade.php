@@ -34,7 +34,7 @@
         </div>
         <div class="mb-4">
             <label for="description" class="block text-gray-700">Description</label>
-            <textarea name="description" id="description" class="w-full px-4 py-2 border rounded-lg" ></textarea>
+            <textarea name="description" id="description" class="w-full px-4 py-2 border rounded-lg" required></textarea>
         </div>
         <div class="mb-4">
             <label for="status" class="block text-gray-700">Status</label>

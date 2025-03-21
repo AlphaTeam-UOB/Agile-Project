@@ -20,15 +20,18 @@ class AppointmentController extends Controller
             'consultation_type' => 'required|string',
             'description' => 'required|string',
         ]);
-
+    
         $appointment = Appointment::create($request->all());
-
+    
         // Send confirmation email
         Mail::to($request->email)->send(new AppointmentConfirmationMail($appointment));
-
-        return redirect()->back()->with('success', 'Appointment booked successfully! A confirmation email has been sent.');
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Appointment booked successfully! A confirmation email has been sent.'
+        ]);
     }
-
+    
     // Fetch all appointments (optional for admin view)
     public function index()
     {
