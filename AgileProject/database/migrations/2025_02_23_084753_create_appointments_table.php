@@ -13,9 +13,12 @@ return new class extends Migration {
             $table->string('email');
             $table->date('date');
             $table->string('time');
-            $table->string('consultation_type');
-            $table->text('description');
-            $table->enum('status', ['pending', 'completed'])->default('pending'); // Add status column
+            $table->string('consultation_type')->default('General');
+
+            $table->text('description')->nullable();
+
+            $table->enum('status', [ 'completed', 'cancelled', 'Scheduled'])->default('Scheduled');
+
             $table->timestamps();
         });
     }

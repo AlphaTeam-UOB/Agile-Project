@@ -67,9 +67,9 @@ You can manually create an admin user using Laravel Tinker:
    use App\Models\User;
 
    User::create([
-       'name' => 'Admin',
-       'email' => 'admin@example.com',
-       'password' => bcrypt('your_secure_password'),
+       'name' => 'test',
+       'email' => 'test@test.com',
+       'password' => bcrypt('12345678'),
    ]);
    ```
 

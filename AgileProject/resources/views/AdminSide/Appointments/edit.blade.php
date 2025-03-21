@@ -25,11 +25,17 @@
         </div>
         <div class="mb-4">
             <label for="consultation_type" class="block text-gray-700">Consultation Type</label>
-            <input type="text" name="consultation_type" id="consultation_type" class="w-full px-4 py-2 border rounded-lg" value="{{ $appointment->consultation_type }}" required>
+            <select name="consultation_type" id="consultation_type" class="w-full px-4 py-2 border rounded-lg" required>
+                <option value="General Checkup" {{ $appointment->consultation_type == 'General Checkup' ? 'selected' : '' }}>General Checkup</option>
+                <option value="Eye Examination" {{ $appointment->consultation_type == 'Eye Examination' ? 'selected' : '' }}>Eye Examination</option>
+                <option value="Contact Lens Fitting" {{ $appointment->consultation_type == 'Contact Lens Fitting' ? 'selected' : '' }}>Contact Lens Fitting</option>
+                <option value="Other" {{ $appointment->consultation_type == 'Other' ? 'selected' : '' }}>Other</option>
+            </select>
         </div>
+        
         <div class="mb-4">
             <label for="description" class="block text-gray-700">Description</label>
-            <textarea name="description" id="description" class="w-full px-4 py-2 border rounded-lg" required>{{ $appointment->description }}</textarea>
+            <textarea name="description" id="description" class="w-full px-4 py-2 border rounded-lg" >{{ $appointment->description }}</textarea>
         </div>
         <div class="mb-4">
             <label for="status" class="block text-gray-700">Status</label>

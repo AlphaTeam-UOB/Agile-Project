@@ -30,6 +30,8 @@ class AppointmentController extends Controller
             'date' => 'required|date',
             'time' => 'required|date_format:H:i',
             'status' => 'required|in:Scheduled,Completed,Cancelled',
+            'consultation_type' => 'required|string', 
+            'description' => 'nullable|string',
         ]);
 
         Appointment::create([
@@ -38,6 +40,8 @@ class AppointmentController extends Controller
             'date' => $request->date,
             'time' => $request->time,
             'status' => $request->status,
+            'consultation_type' => $request->consultation_type,
+            'description' => $request->description,
         ]);
 
         return redirect()->route('admin.appointments.index')->with('success', 'Appointment created successfully!');
@@ -59,6 +63,8 @@ class AppointmentController extends Controller
             'date' => 'required|date',
             'time' => 'required|string',
             'status' => 'required|in:Scheduled,Completed,Cancelled',
+            'consultation_type' => 'required|string', 
+            'description' => 'nullable|string',
         ]);
 
         $appointment = Appointment::findOrFail($id);
@@ -68,6 +74,8 @@ class AppointmentController extends Controller
             'date' => $request->date,
             'time' => $request->time,
             'status' => $request->status,
+            'consultation_type' => $request->consultation_type,
+            'description' => $request->description,
         ]);
 
         return redirect()->route('admin.appointments.index')->with('success', 'Appointment updated successfully!');

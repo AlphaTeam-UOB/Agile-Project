@@ -76,7 +76,9 @@ class ChatbotController extends Controller
             // Handle the intent locally
             $intentName = $responseData['queryResult']['intent']['displayName'];
             $parameters = $responseData['queryResult']['parameters'];
-            $outputContexts = $responseData['queryResult']['outputContexts'];
+            
+            // Safely access outputContexts (default to an empty array if not present)
+            $outputContexts = $responseData['queryResult']['outputContexts'] ?? [];
     
             // Check if the follow-up message is related to checking availability
             if ($intentName === 'Fallback Intent' && $this->isAvailabilityFollowUp($outputContexts)) {
@@ -193,8 +195,8 @@ class ChatbotController extends Controller
     private function bookAppointment($parameters, $outputContexts)
     {
         try {
-            // Extract parameters from the request
-            $dateTime = $parameters['date-time']['date_time'];
+            // Extract the date-time from the parameters
+            $dateTime = $parameters['date-time'];
     
             // Handle consultation_type (convert array to string if necessary)
             $consultationType = $parameters['consultationtype'] ?? 'General'; // Default to 'General' if not provided
@@ -212,11 +214,13 @@ class ChatbotController extends Controller
                 return "Please provide a valid date and time for the appointment.";
             }
     
-            // Parse the date and time
-            $dateTimeObj = new \DateTime($dateTime, new \DateTimeZone('UTC')); // Assume UTC for consistency
-            $dateTimeObj->setTimezone(new \DateTimeZone('Asia/Colombo')); // Convert to your desired timezone
+            // Parse the date and time (assuming the input is in UTC)
+            $dateTimeObj = new \DateTime($dateTime, new \DateTimeZone('UTC'));
     
-            // Format the date and time
+            // Convert to the user's time zone (e.g., Asia/Colombo)
+            $dateTimeObj->setTimezone(new \DateTimeZone('Asia/Colombo'));
+    
+            // Format the date and time for display and database storage
             $date = $dateTimeObj->format('Y-m-d');
             $time = $dateTimeObj->format('H:i:s');
     
@@ -237,10 +241,10 @@ class ChatbotController extends Controller
                 'time' => $time,
                 'consultation_type' => $consultationType,
                 'description' => $description ?? '', // Use provided description or default
-                'status' => 'Pending', // Default status
+                'status' => 'Scheduled', // Use 'Scheduled' instead of 'Pending'
             ]);
     
-            // Return a success message
+            // Return a success message with the correct time
             return "Your appointment has been booked for $date at $time. We will contact you shortly.";
         } catch (\Exception $e) {
             \Log::error('Appointment Booking Error:', [
@@ -250,5 +254,4 @@ class ChatbotController extends Controller
             return "Sorry, I couldn't book your appointment. Please try again later.";
         }
     }
-    
 }

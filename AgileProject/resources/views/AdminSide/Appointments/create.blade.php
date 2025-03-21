@@ -23,12 +23,18 @@
             <input type="time" name="time" id="time" class="w-full px-4 py-2 border rounded-lg" required>
         </div>
         <div class="mb-4">
-            <label for="consultation_type" class="block text-gray-700">Consultation Type</label>
-            <input type="text" name="consultation_type" id="consultation_type" class="w-full px-4 py-2 border rounded-lg" required>
+            <label class="block text-lg font-semibold text-gray-700 mt-4">Type of Consultation</label>
+            <select name="consultation_type" required class="w-full p-2 border border-gray-300 rounded-lg mt-2">
+                <option value="">Select Consultation Type</option>
+                <option value="General Checkup">General Checkup</option>
+                <option value="Eye Examination">Eye Examination</option>
+                <option value="Contact Lens Fitting">Contact Lens Fitting</option>
+                <option value="Other">Other</option>
+            </select>
         </div>
         <div class="mb-4">
             <label for="description" class="block text-gray-700">Description</label>
-            <textarea name="description" id="description" class="w-full px-4 py-2 border rounded-lg" required></textarea>
+            <textarea name="description" id="description" class="w-full px-4 py-2 border rounded-lg" ></textarea>
         </div>
         <div class="mb-4">
             <label for="status" class="block text-gray-700">Status</label>
