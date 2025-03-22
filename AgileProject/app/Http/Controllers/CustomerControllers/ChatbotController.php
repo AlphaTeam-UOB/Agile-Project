@@ -9,25 +9,25 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Appointment; // Import the Appointment model
 
 class ChatbotController extends Controller
-{public function handleRequest(Request $request)
+{  public function handleRequest(Request $request)
     {
         \Log::info('Chatbot request received:', $request->all());
-    
+
         // Get the user's message from the request
         $userMessage = $request->input('message');
-    
+
         // Get the output contexts from the request (if any)
         $outputContexts = $request->input('queryResult.outputContexts', []);
-    
+
         // Send the message to Dialogflow and get the response
         $responseText = $this->sendToDialogflow($userMessage, $outputContexts);
-    
+
         // Return the response as JSON
         return response()->json([
             "fulfillmentText" => $responseText
         ]);
     }
-    
+
     private function sendToDialogflow($userMessage, $outputContexts)
     {
         try {
@@ -35,18 +35,18 @@ class ChatbotController extends Controller
             $credentialsPath = storage_path('app/dialogflow-key.json');
             $projectId = env('DIALOGFLOW_PROJECT_ID');
             $sessionId = uniqid();
-    
+
             // Create a Google_Client instance
             $client = new Google_Client();
             $client->setAuthConfig($credentialsPath);
             $client->addScope('https://www.googleapis.com/auth/dialogflow');
-    
+
             // Get the Guzzle HTTP client
             $httpClient = $client->authorize();
-    
+
             // Define the Dialogflow API endpoint
             $url = "https://dialogflow.googleapis.com/v2/projects/$projectId/agent/sessions/$sessionId:detectIntent";
-    
+
             // Send the POST request to Dialogflow
             $response = $httpClient->post($url, [
                 'json' => [
@@ -61,37 +61,36 @@ class ChatbotController extends Controller
                     ],
                 ],
             ]);
-    
+
             // Decode the response
             $responseData = json_decode($response->getBody(), true);
-    
+
             // Log the full response for debugging
             \Log::info('Dialogflow API Response:', $responseData);
-    
+
             // Check if the response contains the expected key
             if (!isset($responseData['queryResult'])) {
                 throw new \Exception('Invalid response from Dialogflow API: queryResult key missing.');
             }
-    
+
             // Handle the intent locally
             $intentName = $responseData['queryResult']['intent']['displayName'];
             $parameters = $responseData['queryResult']['parameters'];
-            
+
             // Safely access outputContexts (default to an empty array if not present)
             $outputContexts = $responseData['queryResult']['outputContexts'] ?? [];
-    
-            // Check if the follow-up message is related to checking availability
-            if ($intentName === 'Fallback Intent' && $this->isAvailabilityFollowUp($outputContexts)) {
-                return $this->handleAvailabilityFollowUp($userMessage, $outputContexts);
-            }
-    
+
+            // Handle the intent based on the intent name
             switch ($intentName) {
+                case 'Cancel Appointment Intent':
+                    return $this->cancelAppointment($parameters, $outputContexts);
+                case 'Reschedule Appointment Intent':
+                        return $this->rescheduleAppointment($parameters, $outputContexts);
+                case 'BookAppointmentIntent':
+            case 'Schedule Appointment Intent':
+                    return $this->bookAppointment($parameters, $outputContexts);
                 case 'CheckAvailabilityIntent':
                     return $this->checkAvailability($parameters, $outputContexts);
-                case 'BookAppointmnetIntent':
-                    return $this->bookAppointment($parameters, $outputContexts);
-                case 'show_free_slots':
-                    return $this->showFreeSlots($parameters);
                 default:
                     return $responseData['queryResult']['fulfillmentText'];
             }
@@ -195,38 +194,46 @@ class ChatbotController extends Controller
     private function bookAppointment($parameters, $outputContexts)
     {
         try {
-            // Extract the date-time from the parameters
-            $dateTime = $parameters['date-time'];
+            // Log the parameters for debugging
+            \Log::info('Booking Appointment Parameters:', $parameters);
+    
+            // Extract date and time from parameters
+            $date = $parameters['date'][0] ?? null; // Take the first element if it's an array
+            $time = $parameters['time'][0] ?? null; // Take the first element if it's an array
+    
+            // Validate date and time
+            if (empty($date) || empty($time)) {
+                return "Please provide a valid date and time for the appointment.";
+            }
+    
+            // Extract date part from $date and time part from $time
+            $datePart = (new \DateTime($date))->format('Y-m-d');
+            $timePart = (new \DateTime($time))->format('H:i:s');
+    
+            // Combine date and time into a single DateTime string
+            $dateTimeString = "$datePart $timePart";
+    
+            // Parse the combined date and time (assuming the input is in UTC)
+            $dateTimeObj = new \DateTime($dateTimeString, new \DateTimeZone('UTC'));
+    
+            // Convert to the user's time zone (e.g., Asia/Colombo)
+            $dateTimeObj->setTimezone(new \DateTimeZone('Asia/Colombo'));
+    
+            // Format the date and time for display and database storage
+            $formattedDate = $dateTimeObj->format('Y-m-d');
+            $formattedTime = $dateTimeObj->format('H:i:s');
     
             // Handle consultation_type (convert array to string if necessary)
-            $consultationType = $parameters['consultationtype'] ?? 'General'; // Default to 'General' if not provided
-            if (is_array($consultationType)) {
-                $consultationType = $consultationType[0] ?? 'General'; // Take the first element if it's an array
-            }
+            $consultationType = $parameters['consultationtype'][0] ?? 'General'; // Take the first element if it's an array
     
             // Extract user details from contexts
             $name = $this->getContextParameter($outputContexts, 'awaiting_name', 'name');
             $email = $this->getContextParameter($outputContexts, 'awaiting_email', 'email');
             $description = $this->getContextParameter($outputContexts, 'awaiting_description', 'description');
     
-            // Validate the date and time
-            if (empty($dateTime)) {
-                return "Please provide a valid date and time for the appointment.";
-            }
-    
-            // Parse the date and time (assuming the input is in UTC)
-            $dateTimeObj = new \DateTime($dateTime, new \DateTimeZone('UTC'));
-    
-            // Convert to the user's time zone (e.g., Asia/Colombo)
-            $dateTimeObj->setTimezone(new \DateTimeZone('Asia/Colombo'));
-    
-            // Format the date and time for display and database storage
-            $date = $dateTimeObj->format('Y-m-d');
-            $time = $dateTimeObj->format('H:i:s');
-    
             // Check for conflicting appointments
-            $conflictingAppointment = Appointment::where('date', $date)
-                ->where('time', $time)
+            $conflictingAppointment = Appointment::where('date', $formattedDate)
+                ->where('time', $formattedTime)
                 ->first();
     
             if ($conflictingAppointment) {
@@ -237,15 +244,15 @@ class ChatbotController extends Controller
             $appointment = Appointment::create([
                 'name' => $name ?? 'Customer', // Use provided name or default
                 'email' => $email ?? 'customer@example.com', // Use provided email or default
-                'date' => $date,
-                'time' => $time,
+                'date' => $formattedDate,
+                'time' => $formattedTime,
                 'consultation_type' => $consultationType,
                 'description' => $description ?? '', // Use provided description or default
                 'status' => 'Scheduled', // Use 'Scheduled' instead of 'Pending'
             ]);
     
             // Return a success message with the correct time
-            return "Your appointment has been booked for $date at $time. We will contact you shortly.";
+            return "Your appointment has been booked for $formattedDate at $formattedTime. We will contact you shortly.";
         } catch (\Exception $e) {
             \Log::error('Appointment Booking Error:', [
                 'error' => $e->getMessage(),
@@ -254,4 +261,104 @@ class ChatbotController extends Controller
             return "Sorry, I couldn't book your appointment. Please try again later.";
         }
     }
+    private function cancelAppointment($parameters, $outputContexts)
+{
+    try {
+        // Log the parameters for debugging
+        \Log::info('Cancellation Parameters:', $parameters);
+
+        // Extract the appointment ID and email from the parameters
+        $appointmentID = $parameters['appointmentID'] ?? null;
+        $email = $parameters['email'] ?? null; // Fix the typo here
+
+        // Validate the required parameters
+        if (empty($appointmentID) || empty($email)) {
+            return "Sorry, I couldn't process your request. Please provide both the appointment ID and your email address.";
+        }
+
+        // Find the appointment in the database
+        $appointment = Appointment::where('id', $appointmentID)
+            ->where('email', $email)
+            ->first();
+
+        if ($appointment) {
+            // Cancel the appointment
+            $appointment->update(['status' => 'Cancelled']);
+            return "Your appointment (ID: $appointmentID) has been cancelled. Let me know if you need any further assistance.";
+        } else {
+            return "Sorry, I couldn't find your appointment. Please check the details and try again.";
+        }
+    } catch (\Exception $e) {
+        \Log::error('Cancellation Error:', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        return "Sorry, I couldn't cancel your appointment. Please try again later.";
+    }
+}
+private function rescheduleAppointment($parameters, $outputContexts)
+{
+    try {
+        // Log the parameters for debugging
+        \Log::info('Rescheduling Parameters:', $parameters);
+
+        // Extract the required parameters
+        $email = $parameters['email'] ?? null;
+        $newDate = $parameters['newDate'] ?? null;
+        $newTime = $parameters['newTime'] ?? null;
+
+        // Validate the required parameter (email)
+        if (empty($email)) {
+            return "Sorry, I couldn't process your request. Please provide your email address.";
+        }
+
+        // Validate that at least one of newDate or newTime is provided
+        if (empty($newDate) && empty($newTime)) {
+            return "Sorry, I couldn't process your request. Please provide either a new date or a new time.";
+        }
+
+        // Find the appointment in the database using the email
+        $appointment = Appointment::where('email', $email)
+            ->where('status', 'Scheduled') // Ensure the appointment is in a reschedulable state
+            ->first();
+
+        if (!$appointment) {
+            return "Sorry, I couldn't find your appointment. Please check the details and try again.";
+        }
+
+        // Update the appointment with the new date and/or time
+        if (!empty($newDate)) {
+            $newDateFormatted = (new \DateTime($newDate))->format('Y-m-d');
+            $appointment->date = $newDateFormatted;
+        }
+
+        if (!empty($newTime)) {
+            $newTimeFormatted = (new \DateTime($newTime))->format('H:i:s');
+            $appointment->time = $newTimeFormatted;
+        }
+
+        // Mark the appointment as rescheduled
+        // $appointment->status = 'Rescheduled';
+        $appointment->save();
+
+        // Prepare the response message
+        $responseMessage = "Your appointment has been rescheduled.";
+        if (!empty($newDate)) {
+            $responseMessage .= " New date: $newDateFormatted.";
+        }
+        if (!empty($newTime)) {
+            $responseMessage .= " New time: $newTimeFormatted.";
+        }
+        $responseMessage .= " Let me know if you need any further assistance.";
+
+        return $responseMessage;
+    } catch (\Exception $e) {
+        \Log::error('Rescheduling Error:', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        return "Sorry, I couldn't reschedule your appointment. Please try again later.";
+    }
+}  
+
 }
