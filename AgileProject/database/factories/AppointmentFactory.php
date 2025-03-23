@@ -28,7 +28,7 @@ class AppointmentFactory extends Factory
             'time' => $this->faker->time,
             'consultation_type' => $this->faker->word,
             'description' => $this->faker->sentence,
-            'status' => 'pending',
+            'status' => 'Scheduled',
         ];
     }
 }
