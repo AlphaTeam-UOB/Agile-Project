@@ -1,4 +1,4 @@
-# Laravel Project Setup Guide
+# Laravel Project Setup
 
 ## Prerequisites
 Before starting, make sure you have the following installed:
