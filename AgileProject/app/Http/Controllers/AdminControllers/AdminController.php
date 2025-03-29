@@ -41,7 +41,7 @@ class AdminController extends Controller
         return view('AdminSide.Profile', compact('admin'));
     }
 
-    // Handle the profile update (username, email, and password)
+    //handle the profile update
     public function updateProfile(Request $request)
     {
         // Validate the incoming data
