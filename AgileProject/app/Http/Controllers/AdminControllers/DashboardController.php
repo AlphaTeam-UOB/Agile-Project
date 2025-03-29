@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 
+//dashboardcontroller
 class DashboardController extends Controller
 {
     public function index()
