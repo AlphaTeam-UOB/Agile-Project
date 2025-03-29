@@ -62,21 +62,27 @@
 <div class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
     <h1 class="text-xl font-bold">Home</h1>
     <div class="flex items-center space-x-6">
-        <!-- Time-Based Greeting -->
-        <span class="text-gray-700 font-semibold">
-            @php
-                $hour = now()->hour; // Get the current hour
-                $greeting = 'Good Day';
-                if ($hour >= 5 && $hour < 12) {
-                    $greeting = 'Good Morning';
-                } elseif ($hour >= 12 && $hour < 18) {
-                    $greeting = 'Good Afternoon';
-                } elseif ($hour >= 18 && $hour < 22) {
-                    $greeting = 'Good Evening';
-                }
-            @endphp
-            {{ $greeting }},
-        </span>
+   <!-- Time-Based Greeting -->
+<span class="text-gray-700 font-semibold">
+    @php
+        use Carbon\Carbon;
+
+        $hour = Carbon::now()->hour; // Get current hour with Carbon
+        $greeting = 'Good Day';
+
+        if ($hour >= 5 && $hour < 12) {
+            $greeting = 'Good Morning';
+        } elseif ($hour >= 12 && $hour < 18) {
+            $greeting = 'Good Afternoon';
+        } elseif ($hour >= 18 && $hour < 22) {
+            $greeting = 'Good Evening';
+        } else {
+            $greeting = 'Good Night';
+        }
+    @endphp
+    {{ $greeting }},
+</span>
+
 
         <!-- User's Name -->
         <span class="text-gray-700 font-semibold">
@@ -108,7 +114,7 @@
 
             <!-- Copyright Bar -->
             <footer class="bg-gray-800 text-white text-center py-2 mt-auto">
-                &copy; 2024 Admin Panel. All rights reserved.
+            <div class="bg-gray-900 text-gray-400 text-center py-3">© {{ date('Y') }} A.A. Samarasinghe Optometrists. All rights reserved.</div>
             </footer>
         </div>
     </div>
